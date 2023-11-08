@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LLama-2</title>
+    <style>
+        textarea {
+            resize: both;
+            overflow: auto;
+        }
+        #submit-button, #loading-gif {
+            width: 150px;
+            height: 40px;
+        }
+        #loading-gif {
+            display: none;
+        }
+    </style>
+    <script>
+        function onSubmitForm() {
+            var submitButton = document.getElementById('submit-button');
+            var loadingGif = document.getElementById('loading-gif');
+            var outputDiv = document.getElementById('output');
+
+            // Массив URL-адресов GIF
+            var gifArray = [
+                'https://i.gifer.com/origin/89/89bb01d31f20a844d6c5dd250487b386_w200.gif', 
+                'https://i.gifer.com/origin/4e/4e69e6fe3ebf452fa24a85b839088799_w200.gif',
+                'https://i.gifer.com/YFDw.gif',
+                'https://pa1.aminoapps.com/6832/1461e6802ae29dfaafd770acf933a3ef7856dbc5_00.gif',
+                'https://media.tenor.com/k4kmqyjF_74AAAAM/fap-meme.gif',
+                'https://wallpapers-clan.com/wp-content/uploads/2022/08/meme-gif-pfp-17.gif',
+                'https://media1.giphy.com/media/UQ1EI1ML2ABQdbebup/200w.gif?cid=6c09b952uyelw6t1u6maxudv14at6nuisv490xd5fx95ozbz&ep=v1_gifs_search&rid=200w.gif&ct=s'
+                ];
+
+            // Выбор случайного URL из массива
+            var randomGifUrl = gifArray[Math.floor(Math.random() * gifArray.length)];
+
+            // Установка URL случайного GIF для элемента img
+            loadingGif.src = randomGifUrl;
+
+            submitButton.style.display = 'none';
+            loadingGif.style.display = 'block';
+
+            outputDiv.innerHTML = '';
+        }
+    </script>
+</head>
+<body>
+    <h1>Local-LLama-2-kimiko-mistral-7b</h1>
+    <form method="POST" onsubmit="onSubmitForm()">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.temperature.label }}<br>
+            {{ form.temperature(size=32, value=0.1) }} <span>[Значение от 0.1 до 0.99, default=0.1]</span>
+            {% for error in form.temperature.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.top_p.label }}<br>
+            {{ form.top_p(size=32, value=0.5) }} <span>[Значение от 0.1 до 0.99, default=0.5]</span>
+            {% for error in form.top_p.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.tokens.label }}<br>
+            {{ form.tokens(size=32, value=100) }} <span>[Значение от 50 до 1000, default=100]</span>
+            {% for error in form.tokens.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.model_config.label }}<br>
+            <textarea name="model_config" cols="50" rows="10" style="width:500px; height:100px;">{{ form.model_config.data }}</textarea>
+            {% for error in form.model_config.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.query_text.label }}<br>
+            <textarea name="query_text" cols="50" rows="10" style="width:500px; height:100px;">{{ form.query_text.data }}</textarea>
+            {% for error in form.query_text.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
+        <p>{{ form.submit(id='submit-button') }}</p>
+        <img id="loading-gif" alt="Loading..." style="width: 300px; height: 300px; object-fit: contain;">
+    </form>
+    <div id="output"></div>
+    {% if result %}
+    <p>Результат: {{ result.split()|batch(10)|map('join', ' ')|join('\n') }}</p>
+    {% endif %}
+</body>
+</html>
